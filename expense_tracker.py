@@ -403,3 +403,12 @@ with t_col2:
         st.dataframe(split_table, use_container_width=True, hide_index=True)
     else:
         st.info("Add records to populate metrics chart matrix.")
+
+# ---------- FOOTER DISCLAIMER ----------
+st.markdown("---")
+st.markdown(
+    "<div style='text-align: center; color: #64748b; font-size: 0.85rem;'>"
+    "Hosted by Ayaan Sajid | Made by Ibrahim Adeel"
+    "</div>",
+    unsafe_allow_html=True,
+)
