@@ -212,7 +212,7 @@ with st.container(border=True):
         )
 
     with b_col3:
-        st.markdown("<div style='padding-top: 28px;'></div>", unsafe_html=True)
+        st.empty()
         if st.button("💾 Save Budget", use_container_width=True, type="primary"):
             try:
                 state["salary"] = (
@@ -228,7 +228,7 @@ with st.container(border=True):
                 st.error("Use budget formats like 100000, 100k, 2 lakh, 1.5 cr.")
 
     with b_col4:
-        st.markdown("<div style='padding-top: 28px;'></div>", unsafe_html=True)
+        st.empty()
         if st.button(
             "🗑️ Reset System", use_container_width=True, type="secondary"
         ):
@@ -277,7 +277,8 @@ with st.container(border=True):
         c_input = st.selectbox("Category", options=CATEGORIES)
 
     with f_col4:
-        st.markdown("<div style='padding-top: 28px;'></div>", unsafe_html=True)
+        # Use st.empty() as a safe, legal native spacing block
+        st.empty()
         if st.button(
             "🚀 Commit Expense", use_container_width=True, type="primary"
         ):
