@@ -26,43 +26,23 @@ st.html(
 )
 
 # ---------- DATA STORAGE CONFIGURATION ----------
-# Streamlit Cloud utilizes a read-write scratch space directory
 DATA_FILE = Path("expenses_state.json")
 
 CATEGORIES = [
-    "Food",
-    "Transport",
-    "Bills",
-    "Shopping",
-    "Entertainment",
-    "Health",
-    "Education",
-    "Travel",
-    "Gifts",
-    "Subscriptions",
-    "Savings",
-    "Pets",
-    "Other",
+    "Food", "Transport", "Bills", "Shopping", "Entertainment",
+    "Health", "Education", "Travel", "Gifts", "Subscriptions",
+    "Savings", "Pets", "Other",
 ]
 
 CATEGORY_COLORS = {
-    "Food": "#f97316",
-    "Transport": "#0ea5e9",
-    "Bills": "#ef4444",
-    "Shopping": "#a855f7",
-    "Entertainment": "#ec4899",
-    "Health": "#22c55e",
-    "Education": "#6366f1",
-    "Travel": "#14b8a6",
-    "Gifts": "#eab308",
-    "Subscriptions": "#64748b",
-    "Savings": "#10b981",
-    "Pets": "#f59e0b",
+    "Food": "#f97316", "Transport": "#0ea5e9", "Bills": "#ef4444",
+    "Shopping": "#a855f7", "Entertainment": "#ec4899", "Health": "#22c55e",
+    "Education": "#6366f1", "Travel": "#14b8a6", "Gifts": "#eab308",
+    "Subscriptions": "#64748b", "Savings": "#10b981", "Pets": "#f59e0b",
     "Other": "#94a3b8",
 }
 
-# ---------- SCRIPT LOGIC (Your Friend's Original Functions) ----------
-
+# ---------- SCRIPT LOGIC ----------
 
 def parse_money(raw: str) -> float:
     text = str(raw).strip().lower().replace(",", "")
@@ -72,13 +52,9 @@ def parse_money(raw: str) -> float:
 
     multiplier = 1.0
     suffix_map = {
-        "crore": 10_000_000.0,
-        "cr": 10_000_000.0,
-        "lakh": 100_000.0,
-        "lac": 100_000.0,
-        "l": 100_000.0,
-        "m": 1_000_000.0,
-        "k": 1_000.0,
+        "crore": 10_000_000.0, "cr": 10_000_000.0,
+        "lakh": 100_000.0, "lac": 100_000.0, "l": 100_000.0,
+        "m": 1_000_000.0, "k": 1_000.0,
     }
     for suffix, factor in suffix_map.items():
         if text.endswith(suffix):
@@ -139,7 +115,6 @@ def money_label(value: float) -> str:
 
 # ---------- STATE MANAGEMENT ----------
 
-
 def load_state():
     if "app_state" not in st.session_state:
         state = {"salary": 0.0, "limit": 0.0, "expenses": []}
@@ -155,15 +130,9 @@ def load_state():
                             if isinstance(item, dict):
                                 state["expenses"].append(
                                     {
-                                        "title": str(
-                                            item.get("title", "Untitled")
-                                        ),
-                                        "category": str(
-                                            item.get("category", "Other")
-                                        ),
-                                        "amount": to_float(
-                                            item.get("amount", 0.0)
-                                        ),
+                                        "title": str(item.get("title", "Untitled")),
+                                        "category": str(item.get("category", "Other")),
+                                        "amount": to_float(item.get("amount", 0.0)),
                                     }
                                 )
             except Exception:
@@ -189,9 +158,7 @@ state = st.session_state.app_state
 
 # ---------- HEADER SECTION ----------
 st.title("📊 Expense Tracker")
-st.caption(
-    "Supports smart inputs: 1200, 100k, 2 lakh, 1.5 cr. Colorful breakdown included."
-)
+st.caption("Supports smart inputs: 1200, 100k, 2 lakh, 1.5 cr. Colorful breakdown included.")
 
 # ---------- BUDGET SETUP CARD ----------
 with st.container(border=True):
@@ -215,12 +182,8 @@ with st.container(border=True):
         st.empty()
         if st.button("💾 Save Budget", use_container_width=True, type="primary"):
             try:
-                state["salary"] = (
-                    parse_money(salary_input) if salary_input.strip() else 0.0
-                )
-                state["limit"] = (
-                    parse_money(limit_input) if limit_input.strip() else 0.0
-                )
+                state["salary"] = parse_money(salary_input) if salary_input.strip() else 0.0
+                state["limit"] = parse_money(limit_input) if limit_input.strip() else 0.0
                 save_state()
                 st.toast("Budget configuration saved!", icon="✅")
                 st.rerun()
@@ -229,9 +192,7 @@ with st.container(border=True):
 
     with b_col4:
         st.empty()
-        if st.button(
-            "🗑️ Reset System", use_container_width=True, type="secondary"
-        ):
+        if st.button("🗑️ Reset System", use_container_width=True, type="secondary"):
             state["salary"] = 0.0
             state["limit"] = 0.0
             state["expenses"].clear()
@@ -245,7 +206,7 @@ remaining = state["salary"] - spent
 salary_pct = (spent / state["salary"] * 100) if state["salary"] > 0 else 0.0
 limit_pct = (spent / state["limit"] * 100) if state["limit"] > 0 else 0.0
 
-# Dynamic status message matching original budget alerts
+# Dynamic status message
 if state["limit"] > 0 and spent > state["limit"]:
     st.error("⚠️ Over limit. You crossed your custom spending limit.")
 elif state["salary"] > 0 and spent > state["salary"]:
@@ -277,11 +238,8 @@ with st.container(border=True):
         c_input = st.selectbox("Category", options=CATEGORIES)
 
     with f_col4:
-        # Use st.empty() as a safe, legal native spacing block
         st.empty()
-        if st.button(
-            "🚀 Commit Expense", use_container_width=True, type="primary"
-        ):
+        if st.button("🚀 Commit Expense", use_container_width=True, type="primary"):
             if not t_input.strip():
                 st.warning("Enter an expense title.")
             else:
@@ -290,7 +248,6 @@ with st.container(border=True):
                     if parsed_amt <= 0:
                         st.warning("Amount must be greater than 0.")
                     else:
-                        # Append straight to memory state list (mirroring insert at index 0)
                         state["expenses"].insert(
                             0,
                             {
@@ -310,37 +267,43 @@ if spent > 0:
     st.subheader("📊 Spending Breakdown Visualization")
     g_col1, g_col2 = st.columns([1, 1])
 
-    # Category grouping computations
     by_cat = {}
     for item in state["expenses"]:
         cat = item["category"]
         by_cat[cat] = by_cat.get(cat, 0.0) + item["amount"]
 
     with g_col1:
-        # Build clean progress-bar based chart showing item metrics cleanly
         st.markdown("**Category Split Overview**")
         for cat, amt in sorted(by_cat.items(), key=lambda x: x[1], reverse=True):
-            cat_pct = amt / spent
-            color = CATEGORY_COLORS.get(cat, "#94a3b8")
+            # Fallback calculation if spent is 0 or anomalies exist
+            cat_pct = (amt / spent) if spent > 0 else 0.0
+            
+            # CRITICAL FIX: Clamp progress between 0.0 and 1.0 to prevent Streamlit crashes
+            safe_progress = max(0.0, min(1.0, float(cat_pct)))
+            
             st.markdown(
                 f"<small style='font-weight:bold;'>{cat} ({cat_pct*100:.1f}%) — {money_label(amt)}</small>",
                 unsafe_html=True,
             )
-            st.progress(cat_pct)
+            st.progress(safe_progress)
 
     with g_col2:
-        # Standard relative bar graph comparison matching original script
         st.markdown("**Budget Proportions Compared**")
         max_bar_ref = max(spent, state["salary"], state["limit"], 1.0)
 
+        # CRITICAL FIX: Safe boundaries clamped for budget bar proportions
+        sal_progress = max(0.0, min(1.0, state["salary"] / max_bar_ref))
+        lim_progress = max(0.0, min(1.0, state["limit"] / max_bar_ref))
+        spent_progress = max(0.0, min(1.0, spent / max_bar_ref))
+
         st.caption(f"Salary: {money_label(state['salary'])}")
-        st.progress(state["salary"] / max_bar_ref)
+        st.progress(sal_progress)
 
         st.caption(f"Limit: {money_label(state['limit'])}")
-        st.progress(state["limit"] / max_bar_ref)
+        st.progress(lim_progress)
 
         st.caption(f"Total Spent: {money_label(spent)}")
-        st.progress(spent / max_bar_ref)
+        st.progress(spent_progress)
 
 # ---------- DATA TABLES & MANAGEMENT ----------
 st.markdown("---")
@@ -368,7 +331,6 @@ with t_col1:
 
         st.dataframe(formatted_table, use_container_width=True, hide_index=True)
 
-        # Let users drop individual line rows cleanly
         drop_index = st.number_input(
             "Select Record Index to Delete",
             min_value=0,
@@ -404,7 +366,7 @@ with t_col2:
     else:
         st.info("Add records to populate metrics chart matrix.")
 
-# ---------- FOOTER DISCLAIMER ----------
+# ---------- FOOTER ----------
 st.markdown("---")
 st.markdown(
     "<div style='text-align: center; color: #64748b; font-size: 0.85rem;'>"
