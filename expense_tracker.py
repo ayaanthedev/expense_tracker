@@ -34,14 +34,6 @@ CATEGORIES = [
     "Savings", "Pets", "Other",
 ]
 
-CATEGORY_COLORS = {
-    "Food": "#f97316", "Transport": "#0ea5e9", "Bills": "#ef4444",
-    "Shopping": "#a855f7", "Entertainment": "#ec4899", "Health": "#22c55e",
-    "Education": "#6366f1", "Travel": "#14b8a6", "Gifts": "#eab308",
-    "Subscriptions": "#64748b", "Savings": "#10b981", "Pets": "#f59e0b",
-    "Other": "#94a3b8",
-}
-
 # ---------- SCRIPT LOGIC ----------
 
 def parse_money(raw: str) -> float:
@@ -275,23 +267,20 @@ if spent > 0:
     with g_col1:
         st.markdown("**Category Split Overview**")
         for cat, amt in sorted(by_cat.items(), key=lambda x: x[1], reverse=True):
-            # Fallback calculation if spent is 0 or anomalies exist
             cat_pct = (amt / spent) if spent > 0 else 0.0
             
-            # CRITICAL FIX: Clamp progress between 0.0 and 1.0 to prevent Streamlit crashes
+            # Safe progress boundaries between 0.0 and 1.0
             safe_progress = max(0.0, min(1.0, float(cat_pct)))
             
-            st.markdown(
-                f"<small style='font-weight:bold;'>{cat} ({cat_pct*100:.1f}%) — {money_label(amt)}</small>",
-                unsafe_html=True,
-            )
+            # Native Streamlit Markdown (No HTML injection)
+            st.markdown(f"**{cat} ({cat_pct*100:.1f}%)** — {money_label(amt)}")
             st.progress(safe_progress)
 
     with g_col2:
         st.markdown("**Budget Proportions Compared**")
         max_bar_ref = max(spent, state["salary"], state["limit"], 1.0)
 
-        # CRITICAL FIX: Safe boundaries clamped for budget bar proportions
+        # Clamped safety bounds for proportional budget limits
         sal_progress = max(0.0, min(1.0, state["salary"] / max_bar_ref))
         lim_progress = max(0.0, min(1.0, state["limit"] / max_bar_ref))
         spent_progress = max(0.0, min(1.0, spent / max_bar_ref))
@@ -314,9 +303,16 @@ with t_col1:
     if state["expenses"]:
         formatted_table = []
         for i, item in enumerate(state["expenses"]):
+            try:
+                current_amt = float(item["amount"])
+                current_sal = float(state["salary"])
+            except (ValueError, TypeError):
+                current_amt = 0.0
+                current_sal = 0.0
+
             item_sal_pct = (
-                (item["amount"] / state["salary"] * 100)
-                if state["salary"] > 0
+                (current_amt / current_sal * 100)
+                if current_sal > 0
                 else 0.0
             )
             formatted_table.append(
@@ -324,7 +320,7 @@ with t_col1:
                     "Index": i,
                     "Title": item["title"],
                     "Category": item["category"],
-                    "Amount": money_label(item["amount"]),
+                    "Amount": money_label(current_amt),
                     "% Salary Contribution": f"{item_sal_pct:.2f}%",
                 }
             )
@@ -368,9 +364,4 @@ with t_col2:
 
 # ---------- FOOTER ----------
 st.markdown("---")
-st.markdown(
-    "<div style='text-align: center; color: #64748b; font-size: 0.85rem;'>"
-    "Hosted by Ayaan Sajid | Made by Ibrahim Adeel"
-    "</div>",
-    unsafe_allow_html=True,
-)
+st.markdown("##### Hosted by Ayaan Sajid | Made by Ibrahim Adeel")

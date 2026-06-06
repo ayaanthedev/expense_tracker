@@ -1,0 +1,11 @@
+{
+  "salary": 0.0,
+  "spending_limit": 0.0,
+  "expenses": [
+    {
+      "title": "addas",
+      "category": "Food",
+      "amount": 43434.0
+    }
+  ]
+}
